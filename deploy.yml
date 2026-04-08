@@ -1,0 +1,88 @@
+name: Deploy payments-service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+  deploy-staging:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to staging
+        run: |
+          echo "Deploying ${{ github.sha }} to staging"
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: payments-service
+        with:
+          environment: staging
+          version: ${{ github.sha }}
+      - name: Notify Port of deployment
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: UPSERT
+          identifier: payments-service-${{ github.sha }}
+          blueprint: deployment
+          properties: |
+            {
+              "version": "${{ github.sha }}",
+              "service": "payments-service",
+              "environment": "staging",
+              "deployedAt": "${{ github.event.head_commit.timestamp }}",
+              "deployedBy": "${{ github.actor }}"
+            }
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production  # requires manual approval in GitHub
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to production
+        run: |
+          echo "Deploying ${{ github.sha }} to production"
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: payments-service
+        with:
+          environment: production
+          version: ${{ github.sha }}
+      - name: Notify Port of deployment
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: UPSERT
+          identifier: payments-service-${{ github.sha }}
+          blueprint: deployment
+          properties: |
+            {
+              "version": "${{ github.sha }}",
+              "service": "payments-service",
+              "environment": "production",
+              "deployedAt": "${{ github.event.head_commit.timestamp }}",
+              "deployedBy": "${{ github.actor }}"
+            }
