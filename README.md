@@ -17,6 +17,8 @@ POST /checkout
   └── getUser()            → in-memory (see `src/services/user.js`)
   └── reserveInventory()   → in-memory stub (`src/services/inventory.js`)
   └── processPayment()     → Stripe API, or mock if `DEMO_MOCK_STRIPE=true`
+
+GET /demo/sentry/*         → intentional demo errors (see README)
 ```
 
 ## Environment variables
@@ -57,6 +59,22 @@ You should get HTTP **500** and see **`TypeError: Cannot read properties of null
 
 **Fix (for a real codebase):** guard before using `.length`, e.g. `if (!cart.items || cart.items.length === 0)` — see comment in `src/routes/checkout.js` around the intentional bug line.
 
+## Demo: other Sentry errors (different issue types)
+
+These use `src/routes/sentry-demos.js` so you get **different error classes / messages** than the checkout `TypeError` (useful for triage and alert routing demos).
+
+| Endpoint | What Sentry sees |
+|---|---|
+| `GET /demo/sentry/syntax-error` | **`SyntaxError`** from invalid `JSON.parse` (e.g. bad payload from an integration) |
+| `GET /demo/sentry/inventory-timeout` | **`Error`** with message `inventory-service: reservation deadline exceeded…` and `code: ETIMEDOUT` (downstream timeout story) |
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/demo/sentry/syntax-error
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/demo/sentry/inventory-timeout
+```
+
+Both return HTTP **500** and send the exception to Sentry via `captureException`.
+
 ## Optional: happy-path checkout without Stripe
 
 Use the in-memory cart that has items and mock Stripe:
@@ -82,6 +100,8 @@ Deployments are managed via GitHub Actions (`deploy.yml`). Merging to `main` tri
 
 1. Check Sentry for the error type — common causes in this demo:
    - `TypeError: Cannot read properties of null` → null cart items (see demo above)
+   - `SyntaxError` / `Unexpected token` → see `GET /demo/sentry/syntax-error`
+   - `inventory-service: reservation deadline exceeded` → see `GET /demo/sentry/inventory-timeout`
    - `StripeInvalidRequestError` → invalid payment method (when not using `DEMO_MOCK_STRIPE`)
 
 2. Check recent deploys in GitHub Actions or Port — correlate error spike with deploy time
