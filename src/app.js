@@ -5,11 +5,11 @@ const express = require('express');
 const Sentry = require('@sentry/node');
 const checkoutRouter = require('./routes/checkout');
 const healthRouter = require('./routes/health');
+const sentryDemosRouter = require('./routes/sentry-demos');
 const logger = require('./middleware/logger');
 
 const app = express();
 
-console.log(process.env.SENTRY_DSN);
 function parsePort(value, fallback) {
   if (value == null || String(value).trim() === '') return fallback;
   const n = Number.parseInt(String(value).trim(), 10);
@@ -32,6 +32,7 @@ app.use(express.json());
 // Routes
 app.use('/health', healthRouter);
 app.use('/checkout', checkoutRouter);
+app.use('/demo/sentry', sentryDemosRouter);
 
 // Sentry error handler must be before any other error middleware
 app.use(Sentry.Handlers.errorHandler());
