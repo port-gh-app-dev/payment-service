@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "jest --coverage"
+    "test": "jest --config jest.config.js --coverage"
   },
   "dependencies": {
     "@sentry/node": "^7.114.0",

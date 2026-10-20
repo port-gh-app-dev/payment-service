@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Payments Service API
+  version: 1.0.0
+  description: Checkout, payment processing, health, and Sentry demo endpoints.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  service: { type: string, example: payments-service }
+                  version: { type: string }
+                  timestamp: { type: string, format: date-time }
+  /checkout:
+    post:
+      summary: Process a checkout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, cartId, paymentMethodId]
+              properties:
+                userId: { type: string, maxLength: 128 }
+                cartId: { type: string, maxLength: 128 }
+                paymentMethodId: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Checkout completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  orderId: { type: string }
+                  total: { type: number }
+                  estimatedDelivery: { type: string, format: date-time }
+        '400': { description: Invalid request or empty cart }
+        '402': { description: Payment failed }
+        '404': { description: User or cart not found }
+        '409': { description: Inventory unavailable }
+        '500': { description: Internal server error }
+  /demo/sentry/syntax-error:
+    get:
+      summary: Trigger a demo syntax error
+      responses:
+        '500': { description: Internal server error reported to Sentry }
+  /demo/sentry/inventory-timeout:
+    get:
+      summary: Trigger a demo inventory timeout
+      responses:
+        '500': { description: Internal server error reported to Sentry }
