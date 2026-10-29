@@ -1,0 +1,122 @@
+project:
+  name: "payment-service"
+  description: "Node.js/Express checkout and payment service with in-memory demo data, Stripe (or mock) payments and Sentry error reporting."
+  repo_base_url: "https://github.com/port-gh-app-dev/payment-service/blob"
+  ref_commit_hash: "9a0f2d674fc3671ad15f41e6be1c9047bcf5fc14"
+  updated_at: "2026-10-29"
+
+pages:
+  - id: payment-service_01_overview
+    title: "Overview"
+    filename: "01_overview.md"
+    description: "Purpose, stack and layout"
+    source_files: ["README.md", "package.json", "CLAUDE.md"]
+    sections:
+      - id: payment-service_01_overview_introduction
+        title: "Introduction"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_01_overview_tech-stack
+        title: "Technology Stack"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_01_overview_repo-layout
+        title: "Repository Layout"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages: [payment-service_02_architecture]
+
+  - id: payment-service_02_architecture
+    title: "Architecture"
+    filename: "02_architecture.md"
+    description: "App bootstrap, checkout flow, error handling"
+    source_files: ["src/app.js", "src/routes/checkout.js"]
+    sections:
+      - id: payment-service_02_architecture_bootstrap
+        title: "Application Bootstrap"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["flowchart"]
+      - id: payment-service_02_architecture_checkout-flow
+        title: "Checkout Flow"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["sequence"]
+      - id: payment-service_02_architecture_error-handling
+        title: "Error Handling"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages: [payment-service_03_services, payment-service_04_api-reference]
+
+  - id: payment-service_03_services
+    title: "Services and Middleware"
+    filename: "03_services.md"
+    description: "Cart, user, inventory, payment, logger"
+    source_files: ["src/services/*.js", "src/middleware/logger.js"]
+    sections:
+      - id: payment-service_03_services_cart-user
+        title: "Cart and User Services"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_03_services_inventory
+        title: "Inventory Service"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_03_services_payment
+        title: "Payment Service"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["flowchart"]
+      - id: payment-service_03_services_logger
+        title: "Logger"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages: [payment-service_02_architecture]
+
+  - id: payment-service_04_api-reference
+    title: "API and Configuration"
+    filename: "04_api-reference.md"
+    description: "HTTP endpoints and environment variables"
+    source_files: ["openapi.yaml", "src/routes/*.js", ".env.example", "README.md"]
+    sections:
+      - id: payment-service_04_api-reference_endpoints
+        title: "HTTP Endpoints"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_04_api-reference_config
+        title: "Environment Variables"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages: [payment-service_02_architecture]
+
+  - id: payment-service_05_testing-deployment
+    title: "Testing, CI/CD and Runbook"
+    filename: "05_testing-deployment.md"
+    description: "Tests, workflows, operational notes"
+    source_files: ["jest.config.js", "jest.setup.js", "src/__tests__/health.test.js", ".github/workflows/build.yml", "deploy.yml", "README.md"]
+    sections:
+      - id: payment-service_05_testing-deployment_testing
+        title: "Testing"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: payment-service_05_testing-deployment_ci-cd
+        title: "CI/CD"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["flowchart"]
+      - id: payment-service_05_testing-deployment_runbook
+        title: "Runbook"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages: [payment-service_01_overview]
