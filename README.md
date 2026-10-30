@@ -1,6 +1,6 @@
 # payments-service
 
-Handles checkout, payment processing, and order creation for the platform. This repo is wired for **local / Sentry demos**: cart and user data are **in-memory** (no Postgres). Stripe can be mocked for demos that do not need a real payment.
+Handles checkout, payment processing, refunds, and order creation for the platform. This repo is wired for **local / Sentry demos**: cart, user, and order data are **in-memory** (no Postgres). Stripe can be mocked for demos that do not need a real payment.
 
 ## Ownership
 
@@ -17,6 +17,11 @@ POST /checkout
   └── getUser()            → in-memory (see `src/services/user.js`)
   └── reserveInventory()   → in-memory stub (`src/services/inventory.js`)
   └── processPayment()     → Stripe API, or mock if `DEMO_MOCK_STRIPE=true`
+
+POST /refund
+  └── getOrder()           → in-memory (see `src/services/orders.js`)
+  └── getUser()            → in-memory
+  └── processRefund()      → Stripe refunds API, or mock if `DEMO_MOCK_STRIPE=true`
 
 GET /demo/sentry/*         → intentional demo errors (see README)
 ```
@@ -89,6 +94,31 @@ curl -s -X POST http://localhost:3000/checkout \
   -H 'Content-Type: application/json' \
   -d '{"userId":"demo-user","cartId":"cart-with-items","paymentMethodId":"pm_demo"}'
 ```
+
+## Refunds
+
+`POST /refund` refunds all or part of a paid order. Seeded demo orders (in-memory):
+
+| Order ID | Notes |
+|---|---|
+| `ORD-demo-refundable` | Fully paid ($10), nothing refunded yet |
+| `ORD-demo-partial` | $100 order with $25 already refunded |
+| `ORD-demo-fully-refunded` | Already fully refunded — returns **409** |
+
+```bash
+export DEMO_MOCK_STRIPE=1
+npm run dev
+```
+
+```bash
+curl -s -X POST http://localhost:3000/refund \
+  -H 'Content-Type: application/json' \
+  -d '{"userId":"demo-user","orderId":"ORD-demo-refundable","amount":5,"reason":"requested_by_customer"}'
+```
+
+Allowed `reason` values: `requested_by_customer`, `duplicate`, `fraudulent`.
+
+Validation responses: **400** (bad input / amount too high), **403** (order not owned by user), **404** (missing user/order), **409** (already fully refunded), **402** (Stripe/mock refund failure).
 
 ## Deployment
 
