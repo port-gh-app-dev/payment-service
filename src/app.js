@@ -4,6 +4,7 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const express = require('express');
 const Sentry = require('@sentry/node');
 const checkoutRouter = require('./routes/checkout');
+const refundRouter = require('./routes/refund');
 const healthRouter = require('./routes/health');
 const sentryDemosRouter = require('./routes/sentry-demos');
 const logger = require('./middleware/logger');
@@ -32,6 +33,7 @@ app.use(express.json());
 // Routes
 app.use('/health', healthRouter);
 app.use('/checkout', checkoutRouter);
+app.use('/refund', refundRouter);
 app.use('/demo/sentry', sentryDemosRouter);
 
 // Sentry error handler must be before any other error middleware
