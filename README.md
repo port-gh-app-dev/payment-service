@@ -4,7 +4,7 @@ Handles checkout, payment processing, refunds, and order creation for the platfo
 
 ## Ownership
 
-- **Team:** Payments Platform
+- **Team:** Payments Platforms
 - **On-call:** Rotates weekly — see PagerDuty schedule `payments-oncall`
 - **Slack:** #payments-eng
 - **Port catalog:** https://app.getport.io/payments-service
